@@ -8,6 +8,12 @@ export interface IUser extends Document {
   password: string;
   role: UserRole;
 
+  // Campos de perfil
+  primeiroNome?: string;
+  sobrenome?: string;
+  usuario?: string;
+  telefone?: string;
+
   loginAttempts: number;
   lockUntil: number | null;
 
@@ -20,6 +26,12 @@ const UserSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ["operador", "chefe", "admin"], default: "operador" },
+
+    // Campos de perfil
+    primeiroNome: { type: String },
+    sobrenome: { type: String },
+    usuario: { type: String },
+    telefone: { type: String },
 
     loginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Number, default: null }
