@@ -20,6 +20,7 @@ export interface IOcorrencia extends Document {
 
   assinaturaVitimado?: string;
   assinaturaTestemunha?: string;
+  assinatura?: string;
 
   statusSync: "pendente" | "sincronizado";
 
@@ -50,6 +51,7 @@ const OcorrenciaSchema = new Schema<IOcorrencia>(
 
     assinaturaVitimado: { type: String, default: null },
     assinaturaTestemunha: { type: String, default: null },
+    assinatura: { type: String, default: null },
 
     statusSync: {
       type: String,
