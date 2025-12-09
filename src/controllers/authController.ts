@@ -73,7 +73,7 @@ export default {
     try {
       const userId = (req as any).user?.id;
       const user = await User.findById(userId).select('-password -loginAttempts -lockUntil');
-      
+
       if (!user) {
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
@@ -107,7 +107,7 @@ export default {
       if (sobrenome !== undefined) user.sobrenome = sobrenome;
       if (usuario !== undefined) user.usuario = usuario;
       if (telefone !== undefined) user.telefone = telefone;
-      
+
       // Atualiza senha se fornecida
       if (senha && senha.trim() !== '') {
         user.password = senha;
