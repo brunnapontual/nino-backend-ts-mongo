@@ -31,7 +31,8 @@ export default {
           localizacao,
           notas,
           assinaturaVitimado,
-          assinaturaTestemunha
+          assinaturaTestemunha,
+          assinatura
         } = item;
 
         if (!tipo || !dataHora || !viatura || !equipe || !descricao) {
@@ -58,17 +59,18 @@ export default {
           fotos: fotos || [],
           localizacao: localizacao
             ? {
-                latitude: localizacao.latitude,
-                longitude: localizacao.longitude,
-                accuracy: localizacao.accuracy || null,
-                capturedAt: localizacao.capturedAt
-                  ? new Date(localizacao.capturedAt)
-                  : new Date()
-              }
+              latitude: localizacao.latitude,
+              longitude: localizacao.longitude,
+              accuracy: localizacao.accuracy || null,
+              capturedAt: localizacao.capturedAt
+                ? new Date(localizacao.capturedAt)
+                : new Date()
+            }
             : undefined,
           notas,
           assinaturaVitimado: assinaturaVitimado || null,
           assinaturaTestemunha: assinaturaTestemunha || null,
+          assinatura: assinatura || null,
 
           statusSync: "sincronizado",
 
@@ -135,7 +137,8 @@ export default {
         "localizacao",
         "notas",
         "assinaturaVitimado",
-        "assinaturaTestemunha"
+        "assinaturaTestemunha",
+        "assinatura"
       ];
 
       for (const field of allowedFields) {
@@ -192,7 +195,8 @@ export default {
         localizacao,
         notas,
         assinaturaVitimado,
-        assinaturaTestemunha
+        assinaturaTestemunha,
+        assinatura
       } = req.body;
 
       if (!tipo || !dataHora || !viatura || !equipe || !descricao) {
@@ -208,17 +212,18 @@ export default {
         fotos: fotos || [],
         localizacao: localizacao
           ? {
-              latitude: localizacao.latitude,
-              longitude: localizacao.longitude,
-              accuracy: localizacao.accuracy || null,
-              capturedAt: localizacao.capturedAt
-                ? new Date(localizacao.capturedAt)
-                : new Date()
-            }
+            latitude: localizacao.latitude,
+            longitude: localizacao.longitude,
+            accuracy: localizacao.accuracy || null,
+            capturedAt: localizacao.capturedAt
+              ? new Date(localizacao.capturedAt)
+              : new Date()
+          }
           : undefined,
         notas,
         assinaturaVitimado: assinaturaVitimado || null,
         assinaturaTestemunha: assinaturaTestemunha || null,
+        assinatura: assinatura || null,
 
         statusSync: "sincronizado",
 
@@ -252,6 +257,56 @@ export default {
       return res.json(ocorrencias);
     } catch (err) {
       return res.status(500).json({ message: "Erro ao listar ocorrências" });
+    }
+  },
+
+  async deletar(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Não autenticado" });
+      }
+
+      const { id } = req.params;
+
+      const ocorrencia = await Ocorrencia.findById(id);
+      if (!ocorrencia) {
+        return res.status(404).json({ message: "Ocorrência não encontrada" });
+      }
+
+      // Operador só pode deletar as próprias, chefe/admin podem deletar qualquer uma
+      if (req.user.role === "operador" && ocorrencia.createdBy.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Sem permissão para deletar esta ocorrência" });
+      }
+
+      await Ocorrencia.findByIdAndDelete(id);
+
+      return res.json({ message: "Ocorrência deletada com sucesso" });
+    } catch (err) {
+      return res.status(500).json({ message: "Erro ao deletar ocorrência" });
+    }
+  },
+
+  async buscarPorId(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Não autenticado" });
+      }
+
+      const { id } = req.params;
+
+      const ocorrencia = await Ocorrencia.findById(id);
+      if (!ocorrencia) {
+        return res.status(404).json({ message: "Ocorrência não encontrada" });
+      }
+
+      // Operador só pode ver as próprias
+      if (req.user.role === "operador" && ocorrencia.createdBy.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Sem permissão para ver esta ocorrência" });
+      }
+
+      return res.json(ocorrencia);
+    } catch (err) {
+      return res.status(500).json({ message: "Erro ao buscar ocorrência" });
     }
   }
 };
