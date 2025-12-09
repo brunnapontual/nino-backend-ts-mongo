@@ -53,11 +53,82 @@ export default {
     return res.json({
       message: "Login bem-sucedido",
       token,
-      role: user.role
+      role: user.role,
+      user: {
+        email: user.email,
+        role: user.role,
+        primeiroNome: user.primeiroNome || '',
+        sobrenome: user.sobrenome || '',
+        usuario: user.usuario || '',
+        telefone: user.telefone || ''
+      }
     });
   },
 
   async logout(req: Request, res: Response) {
     return res.json({ message: "Logout efetuado" });
+  },
+
+  async getProfile(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      const user = await User.findById(userId).select('-password -loginAttempts -lockUntil');
+      
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      return res.json({
+        email: user.email,
+        role: user.role,
+        primeiroNome: user.primeiroNome || '',
+        sobrenome: user.sobrenome || '',
+        usuario: user.usuario || '',
+        telefone: user.telefone || ''
+      });
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error);
+      return res.status(500).json({ message: "Erro ao buscar perfil" });
+    }
+  },
+
+  async updateProfile(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      const { primeiroNome, sobrenome, usuario, telefone, senha } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Atualiza campos de perfil
+      if (primeiroNome !== undefined) user.primeiroNome = primeiroNome;
+      if (sobrenome !== undefined) user.sobrenome = sobrenome;
+      if (usuario !== undefined) user.usuario = usuario;
+      if (telefone !== undefined) user.telefone = telefone;
+      
+      // Atualiza senha se fornecida
+      if (senha && senha.trim() !== '') {
+        user.password = senha;
+      }
+
+      await user.save();
+
+      return res.json({
+        message: "Perfil atualizado com sucesso",
+        user: {
+          email: user.email,
+          role: user.role,
+          primeiroNome: user.primeiroNome || '',
+          sobrenome: user.sobrenome || '',
+          usuario: user.usuario || '',
+          telefone: user.telefone || ''
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      return res.status(500).json({ message: "Erro ao atualizar perfil" });
+    }
   }
 };

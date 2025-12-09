@@ -12,4 +12,8 @@ router.get("/admin-only", authMiddleware, allowRoles("admin"), (req, res) => {
 router.post("/login", authController.login);
 router.post("/logout", authMiddleware, authController.logout);
 
+// Rotas de perfil
+router.get("/profile", authMiddleware, authController.getProfile);
+router.put("/profile", authMiddleware, authController.updateProfile);
+
 export default router;
