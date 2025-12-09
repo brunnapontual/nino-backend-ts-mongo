@@ -1,5 +1,5 @@
   <a href="https://nino-backend-ts-mongo.onrender.com/" target="_blank"> 
-    <img src="https://img.shields.io/badge/Deploy%20Render-Online-success?logo=render&logoColor=white" alt="Status de Deploy" />
+    <img src="https://img.shields.io/badge/Render-Online-success?logo=render&logoColor=white" alt="Status de Deploy" />
   </a>
   
 # ![Logo](src/img/logo.png) 
