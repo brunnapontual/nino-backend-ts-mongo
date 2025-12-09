@@ -1,5 +1,4 @@
 # ![Logo](src/img/logo.png)
-# 🦊 Nino Backend  
 Bem-vindo ao backend do Nino, uma API REST construída com Node.js + TypeScript + Express + MongoDB (Mongoose).  
 Implementando operações CRUD e arquitetura modular para gerenciamento de dados da aplicação Nino.  
 A arquitetura do projeto segue um padrão MVC, estruturado em camadas  
