@@ -3,7 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import ocorrenciaRoutes from "./routes/ocorrenciaRoutes";
 import swaggerUi from 'swagger-ui-express';
-import swaggerFile from './swagger_output.json'; 
+import swaggerFile from './swagger_output.json';
 
 const app = express();
 
@@ -21,12 +21,6 @@ swaggerDocument.servers = [
         description: 'Servidor de Desenvolvimento Local' 
     }
 ];
-
-if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
-    swaggerDocument.schemes = ['https'];
-} else {
-    swaggerDocument.schemes = ['http'];
-}
 
 app.use(cors());
 app.use(express.json());
