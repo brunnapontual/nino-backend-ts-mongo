@@ -64,6 +64,63 @@ export default {
       }
     });
   },
+  
+  async registrar(req: Request, res: Response) {
+  try {
+    const { email, password, primeiroNome, sobrenome, usuario, telefone, role } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email e senha são obrigatórios" });
+    }
+
+    if (!role || !['operador', 'chefe', 'admin'].includes(role)) {
+    return res.status(400).json({ message: "Role é obrigatório e deve ser: operador, chefe ou admin" });
+    
+    }
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(409).json({ message: "Email já cadastrado" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Senha deve ter no mínimo 6 caracteres" });
+    }
+
+    const newUser = new User({
+      email,
+      password,
+      primeiroNome: primeiroNome || '',
+      sobrenome: sobrenome || '',
+      usuario: usuario || '',
+      telefone: telefone || '',
+      role, 
+      loginAttempts: 0,
+      lockUntil: null
+    });
+
+    await newUser.save();
+
+    const token = generateToken(newUser);
+
+    return res.status(201).json({
+      message: "Usuário cadastrado com sucesso",
+      token,
+      role: newUser.role,
+      user: {
+        email: newUser.email,
+        role: newUser.role,
+        primeiroNome: newUser.primeiroNome || '',
+        sobrenome: newUser.sobrenome || '',
+        usuario: newUser.usuario || '',
+        telefone: newUser.telefone || ''
+      }
+    });
+    } catch (error) {
+      console.error('Erro ao cadastrar usuário:', error);
+      return res.status(500).json({ message: "Erro ao cadastrar usuário" });
+    }
+  },
 
   async logout(req: Request, res: Response) {
     return res.json({ message: "Logout efetuado" });
